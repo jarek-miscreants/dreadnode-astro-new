@@ -1,0 +1,50 @@
+---
+interface Props {
+  label?: string;
+  variant?: "primary" | "secondary" | "orange";
+  href?: string;       // ← if provided, render as <a>; otherwise <button>
+  type?: "button" | "submit" | "reset";
+  class?: string;
+}
+
+const {
+  label = "Learn More",
+  variant = "primary",
+  href,
+  type = "button",
+  class: className = "",
+} = Astro.props;
+
+const variantClasses = {
+  primary: "bg-dark text-white hover:bg-orange",
+  secondary:
+    "bg-transparent text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white",
+    orange: "bg-orange text-white hover:bg-dark hover:border-orange",
+};
+
+// Pick the element based on whether href was passed.
+// Astro lets you use a variable as a dynamic tag — must start with uppercase.
+const Tag = href ? "a" : "button";
+---
+
+<Tag
+  href={href}
+  type={!href ? type : undefined}
+  class:list={[
+    "group inline-flex max-w-fit border border-muted-dark items-center gap-3 pl-3 pr-5 py-2 transition-colors duration-300 relative rounded-sm text-mono uppercase text-body-sm",
+    variantClasses[variant],
+    className,
+  ]}
+>
+ 
+  <div class="relative w-4 h-4 overflow-hidden">
+    <div class="absolute inset-0 transition-transform duration-300 ease-in-out translate-x-0 group-hover:translate-x-full">
+      <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" class="icon"><path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    </div>
+
+    <div class="absolute inset-0 transition-transform duration-300 ease-in-out -translate-x-full group-hover:translate-x-0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 16 16" fill="none" class="icon"><path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    </div>
+  </div>
+  <div>{label}</div>
+</Tag>

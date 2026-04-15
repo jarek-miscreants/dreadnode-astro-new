@@ -1,0 +1,248 @@
+---
+// Animated terminal with 3 tabs, each with its own command + output lines.
+// Typewriter effect: types command → streams output lines → idles → auto-advances.
+---
+<div class="gradient-frame ">
+<div class="agent-terminal border border-[color:var(--at-border)] bg-[color:var(--at-card)] shadow-2xl shadow-black/50 rounded-sm" data-agent-terminal>
+  <!-- Title bar -->
+  <div class="flex items-center justify-between border-b border-[color:var(--at-border)] bg-[#111] px-4" style="height: 36px;">
+    <div class="flex items-center gap-2">
+      <span class="inline-block" style="width:10px;height:10px;background:#ff5f56;border-radius:50%;"></span>
+      <span class="inline-block" style="width:10px;height:10px;background:#ffbd2e;border-radius:50%;"></span>
+      <span class="inline-block" style="width:10px;height:10px;background:#27c93f;border-radius:50%;"></span>
+    </div>
+    <span class="font-mono text-[10px] uppercase tracking-widest text-[color:var(--at-dim)]">DREADNODE::AGENT v2.0</span>
+    <div class="flex items-center gap-2">
+      <span
+        class="inline-block"
+        style="width:6px;height:6px;border-radius:50%;background:var(--at-green);box-shadow:0 0 6px var(--at-green);animation:at-glow-pulse 2s ease-in-out infinite;"
+      ></span>
+      <span class="font-mono text-[10px] text-[color:var(--at-green)]" data-status>TYPING</span>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="bg-[color:var(--at-card)] font-mono text-[13px] leading-[1.8]" style="min-height: 230px; padding: 20px;">
+    <div class="flex flex-wrap">
+      <span class="text-[color:var(--at-green)]">$&nbsp;</span>
+      <span class="text-[color:var(--at-text)]" data-command></span>
+      <span data-command-caret class="text-[color:var(--at-green)]" style="animation: at-typing-blink 1s step-end infinite;">█</span>
+    </div>
+    <div data-output></div>
+    <div data-idle-prompt class="mt-1 flex" hidden>
+      <span class="text-[color:var(--at-green)]">$&nbsp;</span>
+      <span class="text-[color:var(--at-green)]" style="animation: at-typing-blink 1s step-end infinite;">█</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="grid grid-cols-3 border-t border-[color:var(--at-border)]" data-tabs>
+    <button type="button" data-tab="0" aria-selected="true" class="at-tab">
+      <span class="at-tab-num">01</span><span>TUI</span>
+    </button>
+    <button type="button" data-tab="1" aria-selected="false" class="at-tab border-l border-[color:var(--at-border)]">
+      <span class="at-tab-num">02</span><span>Evaluations</span>
+    </button>
+    <button type="button" data-tab="2" aria-selected="false" class="at-tab border-l border-[color:var(--at-border)]">
+      <span class="at-tab-num">03</span><span>Train and Optimize</span>
+    </button>
+  </div>
+</div>
+</div>
+<style>
+  .agent-terminal {
+    --at-green: #27c93f;
+    --at-border: var(--color-muted-dark);
+    --at-card: #0b0c0e;
+    --at-text: var(--color-light);
+    --at-dim: var(--color-muted);
+    --at-muted: var(--color-muted);
+    --at-accent: var(--color-orange);
+    --at-elevated: var(--color-elevated, #131416);
+  }
+
+  .at-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.125rem;
+    padding: 0.75rem 0;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: transparent;
+    color: var(--at-muted);
+    transition: color 200ms, background-color 200ms, box-shadow 200ms;
+    cursor: pointer;
+  }
+  .at-tab:hover { color: var(--at-text); }
+  .at-tab[aria-selected="true"] {
+    background: var(--at-elevated);
+    color: var(--at-accent);
+    box-shadow: inset 0 2px 0 var(--at-accent);
+  }
+  .at-tab-num {
+    font-size: 9px;
+    color: var(--at-muted);
+  }
+  .at-tab[aria-selected="true"] .at-tab-num { color: color-mix(in srgb, var(--at-accent) 60%, transparent); }
+
+  .at-line {
+    animation: at-line-in 0.25s ease forwards;
+  }
+  .at-line.comment  { color: var(--at-dim); }
+  .at-line.success  { color: var(--at-green); }
+  .at-line.output   { color: var(--at-muted); }
+
+  @keyframes at-typing-blink {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+  @keyframes at-glow-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  @keyframes at-line-in {
+    from { opacity: 0; transform: translateY(2px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<script>
+  type LineType = "comment" | "output" | "success";
+  interface Tab { command: string; lines: { type: LineType; text: string }[]; }
+
+  const TABS: Tab[] = [
+    {
+      command: "dreadnode --agent red-team-v2 --model claude-opus-4-6",
+      lines: [
+        { type: "comment", text: "# Workspace: acme-security | Session: 7f3a" },
+        { type: "output",  text: "> Test the auth flow for privilege escalation paths" },
+        { type: "output",  text: "Calling: http_request, code_exec, analyze_response" },
+        { type: "success", text: "✓ Identified IDOR vulnerability in /api/users/{id}/role" },
+      ],
+    },
+    {
+      command: 'dreadnode evaluation create "prompt-injection-bench"',
+      lines: [
+        { type: "comment", text: "# Task: security_task_benchmark | Model: gpt-4o" },
+        { type: "output",  text: "Scorers: jailbreak_detection, prompt_leak, exfiltration_detection" },
+        { type: "output",  text: "Running 240 samples at concurrency 8..." },
+        { type: "success", text: "✓ pass_rate: 94.2% | precision: 0.97 | recall: 0.91" },
+      ],
+    },
+    {
+      command: "dreadnode optimization create --agent red-team-v2",
+      lines: [
+        { type: "comment", text: "# GEPA: optimizing agent instructions via reflection" },
+        { type: "output",  text: "Iteration 12/20 | candidates: 3 accepted, 1 rejected" },
+        { type: "output",  text: "Pareto frontier updated — best score: 0.94" },
+        { type: "success", text: "✓ Promoted: red-team-v2 → v3 | attack success +18%" },
+      ],
+    },
+  ];
+
+  const TYPE_MS = 25;
+  const LINE_MS = 450;
+  const IDLE_MS = 4500;
+
+  function init(root: HTMLElement) {
+    const cmdEl      = root.querySelector<HTMLElement>("[data-command]")!;
+    const caretEl    = root.querySelector<HTMLElement>("[data-command-caret]")!;
+    const outEl      = root.querySelector<HTMLElement>("[data-output]")!;
+    const idleEl     = root.querySelector<HTMLElement>("[data-idle-prompt]")!;
+    const statusEl   = root.querySelector<HTMLElement>("[data-status]")!;
+    const tabButtons = root.querySelectorAll<HTMLButtonElement>("[data-tab]");
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    let active = 0;
+    let typeTimer: number | undefined;
+    let lineTimer: number | undefined;
+    let nextTimer: number | undefined;
+
+    function clearTimers() {
+      if (typeTimer) { clearInterval(typeTimer); typeTimer = undefined; }
+      if (lineTimer) { clearInterval(lineTimer); lineTimer = undefined; }
+      if (nextTimer) { clearTimeout(nextTimer);  nextTimer = undefined; }
+    }
+
+    function setStatus(s: string) { statusEl.textContent = s; }
+
+    function setTab(i: number) {
+      active = i;
+      tabButtons.forEach((b, idx) =>
+        b.setAttribute("aria-selected", idx === i ? "true" : "false")
+      );
+      run();
+    }
+
+    function run() {
+      clearTimers();
+      const tab = TABS[active];
+      cmdEl.textContent = "";
+      outEl.innerHTML = "";
+      idleEl.hidden = true;
+      caretEl.hidden = false;
+
+      if (reduceMotion) {
+        cmdEl.textContent = tab.command;
+        caretEl.hidden = true;
+        tab.lines.forEach(l => outEl.appendChild(renderLine(l)));
+        idleEl.hidden = false;
+        setStatus("READY");
+        return;
+      }
+
+      setStatus("TYPING");
+      let ci = 0;
+      typeTimer = window.setInterval(() => {
+        if (ci < tab.command.length) {
+          ci++;
+          cmdEl.textContent = tab.command.slice(0, ci);
+        } else {
+          clearInterval(typeTimer);
+          typeTimer = undefined;
+          caretEl.hidden = true;
+          setStatus("EXECUTING");
+          let li = 0;
+          lineTimer = window.setInterval(() => {
+            if (li < tab.lines.length) {
+              outEl.appendChild(renderLine(tab.lines[li]));
+              li++;
+            } else {
+              clearInterval(lineTimer);
+              lineTimer = undefined;
+              idleEl.hidden = false;
+              setStatus("READY");
+              nextTimer = window.setTimeout(() => {
+                setTab((active + 1) % TABS.length);
+              }, IDLE_MS);
+            }
+          }, LINE_MS);
+        }
+      }, TYPE_MS);
+    }
+
+    function renderLine(l: { type: LineType; text: string }) {
+      const div = document.createElement("div");
+      div.className = `at-line ${l.type}`;
+      div.textContent = l.text;
+      return div;
+    }
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.dataset.tab);
+        if (i === active) return;
+        setTab(i);
+      });
+    });
+
+    run();
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-agent-terminal]").forEach(init);
+</script>

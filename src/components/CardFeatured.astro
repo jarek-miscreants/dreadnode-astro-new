@@ -1,0 +1,48 @@
+---
+  // CardFeatured.astro
+  import Eyebrow from "./Eyebrow.astro";
+  import { Icon } from "astro-icon/components";
+  interface Props {
+    eyebrow?: string;
+    title?: string;
+    description?: string;
+    icon?: string;
+    border?: "all" | "y" | "x" | "none";
+    class?: string;
+    titleClass?: string;
+    titleTag?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  }
+  const {
+    eyebrow,
+    title,
+    description,
+    icon,
+    border = "all",
+    class: className = "",
+    titleClass = "h3",
+    titleTag: TitleTag = "h3",
+  } = Astro.props;
+
+  const borderClass = {
+    all:  "border border-muted-dark",
+    y:    "border-y border-muted-dark",
+    x:    "border-x border-muted-dark",
+    none: "",
+  }[border];
+
+  const hasMedia = Astro.slots.has("media");
+  ---
+  <div class:list={["px-4 pt-4 md:pt-6 md:px-8 rounded-sm relative", hasMedia ? "pb-0" : "pb-8", borderClass, className]}>
+    <div class="flex flex-col gap-4">
+      <Eyebrow label={eyebrow} variant="plain" class="text-orange"/>
+      {icon && (
+        <Icon name={icon} class="text-orange w-5 h-5 mb-3" aria-hidden="true" />
+      )}
+      <TitleTag class={titleClass}>{title}</TitleTag>
+      <p class="text-muted">{description}</p>
+      <slot name="media" />   {/* renders nothing if caller passes nothing */}
+      <slot name="button" />
+    </div>
+  </div>
+
+

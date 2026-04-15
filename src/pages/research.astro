@@ -1,0 +1,157 @@
+---
+import { getCollection } from 'astro:content';
+import LayoutMain from '../layouts/LayoutMain.astro';
+import SectionMain from '../components/SectionMain.astro';
+import Grid from '../components/Grid.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import ResourcesCard from '../components/ResourcesCard.astro';
+
+const items = (await getCollection('research', ({ data }) => !data.draft)).sort(
+	(a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0)
+);
+
+const categories = [...new Set(items.map((i) => i.data.category))];
+---
+<LayoutMain>
+	{/* ============================== HERO ============================== */}
+	<SectionMain id="hero" paddingTop="lg" paddingBottom='none' contentClass="  relative">
+		<div class="container-large relative z-10 flex flex-col ">
+            <Eyebrow label="Research" class="text-orange mb-4"/>
+			<h1 class="h2">Research, write ups, talks, and code from the crew.
+            </h1>
+		</div>
+	</SectionMain>
+
+	{/* ============================== RESOURCES ============================== */}
+	<SectionMain id="resources" padding="sm" contentClass="relative">
+		<div class="container-large">
+			<!-- Filter + search toolbar -->
+			<div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+				<div
+					class="flex flex-wrap items-center gap-2"
+					data-filter-bar
+					role="toolbar"
+					aria-label="Filter research by category"
+				>
+				<button
+					type="button"
+					data-filter="all"
+					aria-pressed="true"
+					class="filter-btn is-active border border-light-faded px-3 py-1.5 font-mono text-body-xsm uppercase tracking-wider text-light transition-colors hover:border-t-orange hover:text-orange cursor-pointer"
+				>
+					All <span class="ml-2 text-muted">({items.length})</span>
+				</button>
+				{categories.map((c) => {
+					const count = items.filter((i) => i.data.category === c).length;
+					return (
+						<button
+							type="button"
+							data-filter={c}
+							aria-pressed="false"
+							class="filter-btn border border-light-faded px-3 py-1.5 font-mono text-body-xsm uppercase tracking-wider text-light transition-colors hover:border-t-orange hover:text-orange cursor-pointer"
+						>
+							{c} <span class="ml-2 text-muted">({count})</span>
+						</button>
+					);
+				})}
+				</div>
+
+				<label class="relative block md:w-72">
+					<span class="sr-only">Search research</span>
+					<input
+						type="search"
+						data-search-input
+						placeholder="Search…"
+						class="w-full border border-light-faded bg-dark-5 px-3 py-1.5 font-mono text-body-xsm uppercase tracking-wider text-light placeholder:text-muted focus:border-orange focus:outline-none"
+					/>
+				</label>
+			</div>
+
+			<Grid mobile={1} mobileLandscape={1} tablet={2} desktop={3} gap="gap-2">
+				{items.map((item) => (
+					<div
+						data-category={item.data.category}
+						data-tags={item.data.tags.join(',')}
+						data-search={[item.data.title, item.data.description, item.data.author, item.data.category, ...item.data.tags]
+							.filter(Boolean)
+							.join(' ')
+							.toLowerCase()}
+					>
+						<ResourcesCard
+							title={item.data.title}
+							description={item.data.description}
+							category={item.data.category}
+							author={item.data.author}
+							date={item.data.date}
+							href={item.data.url ?? `/research/${item.id}`}
+						/>
+					</div>
+				))}
+			</Grid>
+
+			<p class="mt-8 font-mono text-body-sm text-muted" data-empty hidden>
+				No results.
+			</p>
+		</div>
+	</SectionMain>
+</LayoutMain>
+
+<style>
+	.filter-btn.is-active {
+		border-top-color: var(--color-orange);
+		color: var(--color-orange);
+	}
+</style>
+
+<script>
+	const bar = document.querySelector<HTMLElement>('[data-filter-bar]');
+	const input = document.querySelector<HTMLInputElement>('[data-search-input]');
+	const cards = document.querySelectorAll<HTMLElement>('[data-category]');
+	const empty = document.querySelector<HTMLElement>('[data-empty]');
+
+	const state = { filter: 'all', query: '' };
+
+	const apply = () => {
+		let visible = 0;
+		cards.forEach((c) => {
+			const catOk = state.filter === 'all' || c.dataset.category === state.filter;
+			const qOk = !state.query || (c.dataset.search?.includes(state.query) ?? false);
+			const show = catOk && qOk;
+			c.hidden = !show;
+			if (show) visible++;
+		});
+		if (empty) empty.hidden = visible > 0;
+
+		bar?.querySelectorAll<HTMLButtonElement>('.filter-btn').forEach((b) => {
+			const active = b.dataset.filter === state.filter;
+			b.classList.toggle('is-active', active);
+			b.setAttribute('aria-pressed', String(active));
+		});
+
+		const url = new URL(window.location.href);
+		if (state.filter === 'all') url.searchParams.delete('filter');
+		else url.searchParams.set('filter', state.filter);
+		if (state.query) url.searchParams.set('q', state.query);
+		else url.searchParams.delete('q');
+		history.replaceState(null, '', url);
+	};
+
+	bar?.addEventListener('click', (e) => {
+		const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+		if (btn?.dataset.filter) {
+			state.filter = btn.dataset.filter;
+			apply();
+		}
+	});
+
+	input?.addEventListener('input', () => {
+		state.query = input.value.trim().toLowerCase();
+		apply();
+	});
+
+	const params = new URL(window.location.href).searchParams;
+	state.filter = params.get('filter') ?? 'all';
+	state.query = (params.get('q') ?? '').toLowerCase();
+	if (input && state.query) input.value = state.query;
+	apply();
+</script>

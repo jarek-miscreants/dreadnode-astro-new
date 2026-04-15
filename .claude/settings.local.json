@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -l \"^url:\" \"E:/Apps/Astro Builds/dreadnode-astro-new/src/content/research/\"*.md)",
+      "Bash(xargs -I{} basename {})",
+      "Bash(grep -rL \"^url:\" \"E:/Apps/Astro Builds/dreadnode-astro-new/src/content/research/\"*.md)"
+    ]
+  }
+}

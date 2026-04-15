@@ -1,0 +1,41 @@
+---
+type PadSize = "none" | "xs" | "sm" | "md" | "lg" | "xl";
+
+interface Props {
+  id?: string;
+  padding?: PadSize;            // shorthand for both
+  paddingTop?: PadSize;         // overrides top
+  paddingBottom?: PadSize;      // overrides bottom
+  contentClass?: string;
+  borderTop?: boolean;
+}
+const {
+  id,
+  padding = "md",
+  paddingTop,
+  paddingBottom,
+  contentClass = "",
+  borderTop = false,
+} = Astro.props;
+
+const top = paddingTop ?? padding;
+const bot = paddingBottom ?? padding;
+
+const ptClass = {
+  none: "", xs: "section-pt-xs", sm: "section-pt-sm",
+  md: "section-pt-md", lg: "section-pt-lg", xl: "section-pt-xl",
+}[top];
+const pbClass = {
+  none: "", xs: "section-pb-xs", sm: "section-pb-sm",
+  md: "section-pb-md", lg: "section-pb-lg", xl: "section-pb-xl",
+}[bot];
+---
+
+<section
+  id={id}
+  class:list={["", borderTop && "border-t border-grid-border"]}
+>  <div class:list={[ptClass, pbClass, " flex flex-col relative", contentClass]}>
+    <slot />
+  </div>
+ 
+</section>

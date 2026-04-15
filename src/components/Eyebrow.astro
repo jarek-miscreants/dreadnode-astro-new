@@ -1,0 +1,12 @@
+---
+interface Props {
+  label?: string;
+  variant?: "default" | "plain";
+  class?: string;
+}
+const { label, variant = "default", class: className = "" } = Astro.props;
+---
+<div class:list={["flex items-center gap-2 text-mono text-body-xsm uppercase tracking-wider", className]}>
+  {variant === "default" && <div class="w-2 h-2 bg-current"></div>}
+  <span>{label}</span>
+</div>

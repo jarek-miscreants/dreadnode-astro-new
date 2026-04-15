@@ -1,0 +1,35 @@
+---
+import { getCollection, render } from 'astro:content';
+import LayoutMain from '../../layouts/LayoutMain.astro';
+import SectionMain from '../../components/SectionMain.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+
+export async function getStaticPaths() {
+	const items = await getCollection('research', ({ data }) => !data.draft && !data.url);
+	return items.map((item) => ({ params: { slug: item.id }, props: { item } }));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+---
+<LayoutMain title={`${item.data.title} — Dreadnode`}>
+	<SectionMain padding="lg" contentClass="relative">
+		<article class="container-large relative z-10 flex flex-col gap-6">
+			<Eyebrow label={item.data.category} class="text-orange" />
+			<h1 class="h2 max-w-[24ch]">{item.data.title}</h1>
+			<p class="text-body-lg text-muted max-w-[60ch]">{item.data.description}</p>
+			{item.data.tags.length > 0 && (
+				<ul class="flex flex-wrap gap-2">
+					{item.data.tags.map((t) => (
+						<li class="inline-flex border border-light-faded px-2 py-0.5 font-mono text-body-xsm uppercase tracking-wider text-muted">
+							{t}
+						</li>
+					))}
+				</ul>
+			)}
+			<div class="prose prose-invert mt-8 max-w-[72ch]">
+				<Content />
+			</div>
+		</article>
+	</SectionMain>
+</LayoutMain>

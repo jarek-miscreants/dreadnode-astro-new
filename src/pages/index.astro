@@ -1,0 +1,252 @@
+---
+import LayoutMain from "../layouts/LayoutMain.astro";
+import SectionMain from "../components/SectionMain.astro";
+import CodeSnippetHero from "../components/CodeSnippetHero.astro";
+import CanvasAnimation from "../components/CanvasAnimation.astro";
+import CardFeatured from "../components/CardFeatured.astro";
+import Button from "../components/Button.astro";
+import Grid from "../components/Grid.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+import AgentTerminal from "../components/AgentTerminal.astro";
+import Nav from "../components/Nav.astro";
+---
+
+<LayoutMain>
+	{/* ============================== HERO ============================== */}
+	<SectionMain
+		id="hero"
+		padding="lg"
+		contentClass="items-center text-center relative"
+	>
+		<CanvasAnimation
+			projectId="home"
+			data-us-project="https://cdn.jsdelivr.net/gh/jarek-miscreants/Dreadnode@main/home.json"
+			class="absolute inset-0 h-full w-full"
+		/>
+		<div class="container-large relative z-10">
+			<h1 class="h1">
+				AI infrastructure <br />
+				<span class="text-text-orange">for the security stack</span>
+			</h1>
+			<p class="text-body-lg lg:text-body-xl text-muted mt-6">
+				Build, evaluate, and deploy security agents with confidence.
+			</p>
+		</div>
+		<CodeSnippetHero
+			code="curl -fsSL https://dreadnode.io/install.sh | bash"
+			class="mt-12"
+		/>
+	</SectionMain>
+
+	{/* ============================ PROBLEM ============================ */}
+	<SectionMain
+		id="problem"
+		paddingTop="lg"
+		paddingBottom="sm"
+		contentClass="relative"
+	>
+		<div class="container-large">
+			<Grid
+				mobile={1}
+				mobileLandscape={1}
+				tablet={2}
+				desktop={2}
+				gap="gap-6"
+			>
+				<CardFeatured
+					title="AI-native security can’t happen without infrastructure"
+					class="bg-elevated"
+					description="AI transformed software engineering and spawned an entire ecosystem of infrastructure companies to accelerate work. Security is undergoing the same transformation, yet the underlying ML ops infrastructure is still missing. So we’re building it."
+					eyebrow="Problem"
+				>
+					<Button
+						slot="button"
+						label="About Dreadnode"
+						variant="orange"
+						href="/problem"
+						class="mt-5"
+					/>
+				</CardFeatured>
+				<CardFeatured
+					title="One platform. The full agent development lifecycle."
+					class="bg-elevated"
+					eyebrow="Platform"
+				/>
+			</Grid>
+		</div>
+	</SectionMain>
+
+	{/* ============================ PLATFORM =========================== */}
+	<SectionMain
+		id="platform"
+		paddingTop="sm"
+		paddingBottom="sm"
+		contentClass="relative"
+	>
+		<div class="container-large">
+			<div class="flex flex-col items-center text-center mb-8 lg:mb-12">
+				<Eyebrow label="Platform" class="text-orange mb-4" />
+				<h2 class="h2 max-w-[24ch]">
+					Close the loop between prototype and production
+				</h2>
+			</div>
+
+			<AgentTerminal />
+		</div>
+	</SectionMain>
+	{/* ============================ ECOSYSTEM =========================== */}
+	<SectionMain id="ecosystem" padding="sm" contentClass="relative">
+		<div class="container-large">
+			<div class="flex flex-col items-center text-center mb-8 lg:mb-12">
+				<Eyebrow label="Ecosystem" class="text-orange mb-4" />
+				<h2 class="h2 max-w-[24ch]">
+					Everything you need to run an agent-driven security program
+				</h2>
+			</div>
+			<Grid
+				mobile={1}
+				mobileLandscape={1}
+				tablet={2}
+				desktop={6}
+				gap="gap-6"
+			>
+				<CardFeatured
+					title="Capabilities"
+					description="Pre-built security agents from Dreadnode's domain experts. Use out of the box or build upon what others have proven."
+					class="bg-elevated col-span-3"
+					titleClass="h3"
+				/>
+				<CardFeatured
+					title="Evaluations"
+					description="Baseline, validate, and optimize agent behavior. Benchmark agent performance against security tasks."
+					class="bg-elevated col-span-3"
+					titleClass="h3"
+				/>
+				<CardFeatured
+					title="Observability"
+					description="Go beyond session logs and gather the deepest level of agent intelligence. Make data-driven decisions that significantly improve outcomes."
+					class="bg-elevated col-span-2"
+					titleClass="h3"
+				/>
+				<CardFeatured
+					title="Flexible and safe deployment"
+					description="Our platform is model and framework agnostic. Your agents, your way. Deploy agents in safe, segmented, and scalable sandbox environments."
+					class="bg-elevated col-span-2"
+					titleClass="h3"
+				/>
+				<CardFeatured
+					title="Worlds"
+					description="Synthetic data generation for active directory environments. Generate trajectories for model training."
+					class="bg-elevated col-span-2"
+					titleClass="h3"
+				/>
+			</Grid>
+		</div>
+	</SectionMain>
+	{/* ============================ FAQ =========================== */}
+	<SectionMain id="Capabilities" padding="sm" contentClass="relative">
+		<div class="container-large">
+			<div class="flex flex-col items-center text-center mb-8 lg:mb-12">
+				<Eyebrow label="Capabilities" class="text-orange mb-4" />
+				<h2 class="h2 max-w-[24ch]">
+					Advanced AI red team capabilities
+				</h2>
+				<p class="text-muted mt-4 text-xl">
+					AI red teaming, penetration testing, and vulnerability
+					research at machine speed and scale.
+				</p>
+			</div>
+			<Grid
+				mobile={1}
+				mobileLandscape={1}
+				tablet={2}
+				desktop={4}
+				gap="gap-6"
+			>
+				<CardFeatured
+					icon="lucide:bug"
+					title="Find and exploit vulnerabilities"
+					description="Use agents to reverse engineer binaries, analyze source code, support fuzzing, and create exploits."
+					class="bg-elevated"
+					titleClass="h5"
+				/>
+				<CardFeatured
+					icon="lucide:network"
+					title="Run network ops"
+					description="Beyond basic shells, agents integrated with command-and-control frameworks to run and support red-team operations."
+					class="bg-elevated"
+					titleClass="h5"
+				/>
+				<CardFeatured
+					icon="lucide:globe"
+					title="Web app penetration testing"
+					description="From bug bounties to SAST, accelerate workflows on web assets with browser automation, tool automation, and follow-up attacks."
+					class="bg-elevated"
+					titleClass="h5"
+				/>
+				<CardFeatured
+					icon="lucide:shield-alert"
+					title="AI security probing"
+					description="Remote code execution, data exfiltration, SSRF, and server-side exploitation through AI interfaces."
+					class="bg-elevated"
+					titleClass="h5"
+				/>
+				<CardFeatured
+					icon="lucide:shield-cog"
+					title="AI safety assessment"
+					description="Probing for vulnerable content generation across languages, modalities, and cultural contexts."
+					class="bg-elevated"
+					titleClass="h5"
+				/>
+				<CardFeatured
+					icon="lucide:bot"
+					title="Agentic security testing"
+					description="Tool misuse, memory poisoning, privilege escalation, and cross-agent attack chains with OWASP compliance mapping."
+					class="bg-elevated"
+					titleClass="h5"
+				/>
+				<CardFeatured
+					icon="lucide:code-2"
+					title="Multi-modal & multilingual probing"
+					description="Attack surface coverage across vision, audio, and low-resource languages."
+					class="bg-elevated"
+					titleClass="h5"
+				/>
+				<CardFeatured
+					icon="lucide:git-compare"
+					title="Model evaluations"
+					description="Comparative stress-testing across model families, versions, and providers to pinpoint regressions."
+					class="bg-elevated"
+					titleClass="h5"
+				/>
+			</Grid>
+		</div>
+	</SectionMain>
+	{/* ============================ CTA =========================== */}
+	<SectionMain
+		id="integrations"
+		paddingTop="lg"
+		paddingBottom="sm"
+		contentClass="relative"
+	>
+		<CanvasAnimation
+			projectId="obtBsepkLtG7yfDC9TaJ"
+			hosted
+			class="pointer-events-none absolute inset-0 z-0"
+		/>
+		<div class="container-large relative z-10">
+			<div class="flex flex-col items-center text-center mb-8 lg:mb-12">
+				<Eyebrow label="Try it now" class="text-white mb-4" />
+				<h2 class="h2 max-w-[24ch]">
+					Explore what’s possible when AI is applied to offense,
+				</h2>
+				<Button
+					label="Get Started"
+					variant="primary"
+					href="https://app.dreadnode.io/?mode=register"
+					class="mt-5"
+				/>
+			</div>
+		</div>
+	</SectionMain>
+</LayoutMain>

@@ -1,0 +1,107 @@
+---
+import Clickable from "./Clickable.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  category?: string;
+  href: string;
+  author?: string;
+  date?: Date;
+  variant?: "default" | "maroon";
+  headingSize?: "h4" | "h5";
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  category,
+  href,
+  author,
+  date,
+  variant = "default",
+  headingSize = "h5",
+  class: className = "",
+} = Astro.props;
+
+const dateLabel = date
+  ? date.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" })
+  : null;
+
+const categoryChipClass: Record<string, string> = {
+  Blog: "border-cat-blog text-cat-blog",
+  Paper: "border-cat-paper text-cat-paper",
+  Talk: "border-cat-talk text-cat-talk",
+  Code: "border-cat-code text-cat-code",
+};
+const chipClass = (category && categoryChipClass[category]) || "border-light-faded text-muted";
+
+const isExternal = /^https?:\/\//.test(href);
+const isMaroon = variant === "maroon";
+const headingMax = headingSize === "h4" ? "max-w-[16ch]" : "max-w-[19ch]";
+---
+
+<div class:list={["resources-card p-2 group relative h-full", className]}>
+  <!-- Corner markers -->
+  <div
+    aria-hidden="true"
+    class="markers pointer-events-none absolute inset-0 z-[1]"
+  >
+    <span class="marker marker-tl h-2 w-2" style="position:absolute;top:0;left:0;border-left:1px solid #ef562f;border-top:1px solid #ef562f;"></span>
+    <span class="marker marker-tr h-2 w-2" style="position:absolute;top:0;right:0;border-right:1px solid #ef562f;border-top:1px solid #ef562f;"></span>
+    <span class="marker marker-bl h-2 w-2" style="position:absolute;bottom:0;left:0;border-bottom:1px solid #ef562f;border-left:1px solid #ef562f;"></span>
+    <span class="marker marker-br h-2 w-2" style="position:absolute;bottom:0;right:0;border-bottom:1px solid #ef562f;border-right:1px solid #ef562f;"></span>
+  </div>
+
+  <!-- Card -->
+  <Clickable
+    href={href}
+    label={title}
+    target={isExternal ? "_blank" : undefined}
+    rel={isExternal ? "noopener noreferrer" : undefined}
+    class={`z-[2] h-full border transition-colors duration-200 ${
+      isMaroon
+        ? "border-light-faded bg-maroon group-hover:bg-[#3a0f0f]"
+        : "border-light-faded bg-dark-5 group-hover:border-light-faded-2 group-hover:bg-dark-6"
+    }`}
+  >
+    <div class="flex h-full min-h-[15rem] flex-col gap-6 p-4 md:p-5">
+      <div class="flex items-start justify-between gap-3">
+        <h3 class:list={[headingSize === "h4" ? "h4" : "h5", headingMax]}>{title}</h3>
+        {category && (
+          <span class:list={[
+            "inline-flex shrink-0 items-center border px-2 py-0.5 font-mono text-body-xsm uppercase tracking-wider",
+            chipClass,
+          ]}>
+            {category}
+          </span>
+        )}
+      </div>
+
+      {description && (
+        <p class="font-mono text-body-sm text-muted transition-colors duration-200 group-hover:text-light">
+          {description}
+        </p>
+      )}
+
+      {(author || dateLabel) && (
+        <div class="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-body-xsm uppercase tracking-wider text-muted">
+          {author && <span>{author}</span>}
+          {author && dateLabel && <span aria-hidden="true">·</span>}
+          {dateLabel && <time datetime={date?.toISOString()}>{dateLabel}</time>}
+        </div>
+      )}
+    </div>
+  </Clickable>
+</div>
+
+<style>
+  .resources-card .markers {
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .resources-card:hover .markers {
+    transform: scale(1);
+  }
+</style>

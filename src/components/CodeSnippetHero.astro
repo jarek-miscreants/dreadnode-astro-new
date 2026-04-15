@@ -1,0 +1,86 @@
+---
+import { codeToHtml } from 'shiki';
+
+interface Props {
+  code: string;
+  lang?: string;
+  label?: string;
+  class?: string;
+}
+
+const { code, lang = "bash", label = "Install Dreadnode", class: className = "" } = Astro.props;
+
+const highlighted = await codeToHtml(code, {
+  lang,
+  theme: {
+    name: 'dreadnode',
+    type: 'dark',
+    bg: 'transparent',
+    fg: '#ffffff',
+    settings: [
+      // Commands like `curl`, `bash`, `pip`, `npm`
+      { scope: ['support.function', 'entity.name.function', 'entity.name.command'], settings: { foreground: '#4ade80' } },
+      // Flags like `-fsSL`
+      { scope: ['variable.parameter', 'entity.other.attribute-name', 'constant.other.option'], settings: { foreground: '#ffffffb3' } },
+      // URLs and strings
+      { scope: ['string', 'string.quoted', 'markup.underline.link', 'constant.other.url'], settings: { foreground: '#ef562f' } },
+      // Pipe / operators
+      { scope: ['keyword.operator', 'punctuation.separator'], settings: { foreground: '#ffffff80' } },
+      // Comments
+      { scope: ['comment'], settings: { foreground: '#ffffff4d', fontStyle: 'italic' } },
+    ],
+  },
+});
+
+// Strip the wrapping <pre><code>...</code></pre> tags — we only want the inner spans
+const inner = highlighted
+  .replace(/^<pre[^>]*><code[^>]*>/, '')
+  .replace(/<\/code><\/pre>$/, '');
+---
+<div class:list={["group relative flex-col inline-flex md:flex-row items-center gap-3 border border-dark-7 bg-dark-secondary px-6 py-6 font-mono text-sm lg:text-body-lg text-light transition hover:border-white/40 hover:shadow-lg cursor-pointer ", className]}
+  data-code={code}
+  role="button"
+  tabindex="0"
+  aria-label={`Copy command: ${code}`}
+>
+  {label && <span class="uppercase text-body-xsm text-muted tracking-wider select-none">{label}</span>}
+  <span class="text-muted select-none" aria-hidden="true">$</span>
+  <code class="flex-1 select-all" set:html={inner} />
+  <span class="copy-icon ml-2 shrink-0 text-muted transition group-hover:text-light" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+  </span>
+  <span class="check-icon ml-2 shrink-0 text-green-400 hidden" aria-hidden="true">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </span>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-code]').forEach((el) => {
+    const handler = () => {
+      const code = el.dataset.code;
+      if (!code) return;
+      navigator.clipboard.writeText(code).then(() => {
+        const copyIcon = el.querySelector('.copy-icon') as HTMLElement;
+        const checkIcon = el.querySelector('.check-icon') as HTMLElement;
+        copyIcon.classList.add('hidden');
+        checkIcon.classList.remove('hidden');
+        setTimeout(() => {
+          copyIcon.classList.remove('hidden');
+          checkIcon.classList.add('hidden');
+        }, 2000);
+      });
+    };
+    el.addEventListener('click', handler);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handler();
+      }
+    });
+  });
+</script>

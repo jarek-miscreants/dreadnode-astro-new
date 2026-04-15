@@ -1,0 +1,59 @@
+---
+interface Props {
+  projectId: string;
+  hosted?: boolean;
+  class?: string;
+}
+
+const { projectId, hosted = false, class: className = "" } = Astro.props;
+const projectSrc = hosted
+  ? undefined
+  : `https://cdn.jsdelivr.net/gh/jarek-miscreants/Dreadnode@main/${projectId}.json`;
+---
+
+<div class:list={["home_hero_bg", className]}>
+  <div
+    data-us-project={hosted ? projectId : undefined}
+    data-us-project-src={projectSrc}
+    class="animation_hero w-full h-full absolute inset-0 [&>canvas]:mt-[8px]"
+  ></div>
+</div>
+
+<script is:inline>
+  (function () {
+    function reinit() {
+      if (!window.UnicornStudio || !window.UnicornStudio.init) return;
+      if (typeof window.UnicornStudio.destroy === "function") {
+        window.UnicornStudio.destroy();
+      }
+      window.UnicornStudio.init();
+      window.UnicornStudio.isInitialized = true;
+    }
+
+    function attachResize() {
+      if (window.__unicornResizeBound) return;
+      window.__unicornResizeBound = true;
+      var t;
+      window.addEventListener("resize", function () {
+        clearTimeout(t);
+        t = setTimeout(reinit, 200);
+      });
+    }
+
+    if (window.UnicornStudio) {
+      attachResize();
+      return;
+    }
+    window.UnicornStudio = { isInitialized: false };
+    var s = document.createElement("script");
+    s.src = "https://cdn.unicorn.studio/v1.4.0/unicornStudio.umd.js";
+    s.onload = function () {
+      if (!window.UnicornStudio.isInitialized) {
+        window.UnicornStudio.init();
+        window.UnicornStudio.isInitialized = true;
+      }
+      attachResize();
+    };
+    (document.head || document.body).appendChild(s);
+  })();
+</script>

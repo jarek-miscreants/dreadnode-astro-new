@@ -1,0 +1,266 @@
+---
+// Navigation — ported from Webflow export.
+// Structure: logo | Platform dropdown | Research | Company dropdown | Updates | Contact CTA
+import Button from "./Button.astro";
+
+type DropdownLink = {
+  label: string;
+  href: string;
+  description?: string;
+  tag?: string;
+  external?: boolean;
+};
+
+type NavItem =
+  | { type: "link"; label: string; href: string; external?: boolean }
+  | { type: "dropdown"; label: string; items: DropdownLink[] };
+
+const navItems: NavItem[] = [
+  { type: "link", label: "Research", href: "/research" },
+  {
+    type: "dropdown",
+    label: "Company",
+    items: [
+      { label: "About", href: "/company/about" },
+      { label: "Newsroom", href: "/company/newsroom" },
+    ],
+  },
+  { type: "link", label: "Pricing", href: "/pricing" },
+  { type: "link", label: "Docs", href: "https://docs.dreadnode.io", external: true },
+];
+---
+
+<header
+  data-nav
+  class="fixed inset-x-0 top-0 z-50 transition-all duration-300"
+>
+  <div
+    data-nav-bar
+    class="mx-auto flex bg-dark h-14 max-w-[90rem] items-center justify-between px-4"
+  >
+    <!-- Logo -->
+    <a href="/" aria-label="Dreadnode home" class="flex items-center">
+      <img src="/images/logo-dreadnode.svg" alt="Dreadnode" class="w-40 h-auto" />
+    </a>
+
+    <!-- Desktop nav links -->
+    <nav class="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+      {navItems.map((item) => {
+        if (item.type === "link") {
+          return (
+            <a
+              href={item.href}
+              target={item.external ? "_blank" : undefined}
+              rel={item.external ? "noopener noreferrer" : undefined}
+              class="px-3 py-2 text-sm font-mono uppercase tracking-wider text-white transition-colors hover:text-orange"
+            >
+              {item.label}
+            </a>
+          );
+        }
+        return (
+          <div class="relative" data-nav-item>
+            <button
+              type="button"
+              data-nav-trigger
+              aria-expanded="false"
+              class="flex items-center gap-1 px-3 py-2 text-sm font-mono uppercase tracking-wider text-white transition-colors hover:text-light cursor-pointer"
+            >
+              {item.label}
+              <svg class="h-3 w-3 mt-0.5 transition-transform" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M3 5L6 8L9 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div
+              data-nav-panel
+              class="absolute left-0 top-full hidden min-w-64 pt-2"
+            >
+              <div class="rounded-main border border-light/10 p-2" style="background: var(--color-dark-5);">
+                {item.items.map((link) => (
+                  <a
+                    href={link.href}
+                    target={link.external ? "_blank" : undefined}
+                    rel={link.external ? "noopener noreferrer" : undefined}
+                    class="group flex items-start gap-3 rounded-small px-3 py-2.5 transition-colors hover:bg-light/5"
+                  >
+                    <span
+                      aria-hidden="true"
+                      class="mt-1.5 inline-block h-1.5 w-1.5  bg-white transition-colors group-hover:bg-orange"
+                    ></span>
+                    <span class="flex-1">
+                      {link.tag && (
+                        <span class="block text-tiny font-mono uppercase tracking-wider text-brand mb-0.5">{link.tag}</span>
+                      )}
+                      <span class="block text-sm font-mono uppercase tracking-wider text-light transition-colors group-hover:text-orange">{link.label}</span>
+                      {link.description && (
+                        <span class="block text-tiny text-light/40">{link.description}</span>
+                      )}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </nav>
+
+    <!-- Right side: CTA -->
+    <div class="flex items-center gap-3">
+      <Button label="Get Started" href="https://app.dreadnode.io/?mode=register" variant="orange" />
+
+      <!-- Mobile hamburger -->
+      <button
+        type="button"
+        data-nav-toggle
+        aria-label="Open menu"
+        aria-expanded="false"
+        class="ml-1 grid h-9 w-9 place-items-center lg:hidden"
+      >
+        <svg class="h-5 w-5 text-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path data-nav-icon-open d="M3 6h18M3 12h18M3 18h18" />
+          <path data-nav-icon-close class="hidden" d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile panel -->
+  <div
+    data-nav-mobile
+    class="hidden overflow-y-auto lg:hidden"
+    style="background: var(--color-dark-5);"
+  >
+    <nav class="flex flex-col gap-1 p-4 text-sm">
+      {navItems.map((item) => {
+        if (item.type === "link") {
+          return (
+            <a
+              href={item.href}
+              target={item.external ? "_blank" : undefined}
+              rel={item.external ? "noopener noreferrer" : undefined}
+              class="rounded-small px-3 py-2.5 font-mono uppercase tracking-wider text-white transition-colors hover:text-light cursor-pointer"
+            >
+              {item.label}
+            </a>
+          );
+        }
+        return item.items.map((link) => (
+          <a
+            href={link.href}
+            target={link.external ? "_blank" : undefined}
+            rel={link.external ? "noopener noreferrer" : undefined}
+            class="group flex items-center gap-3 rounded-small px-3 py-2.5 text-white transition-colors hover:text-orange cursor-pointer"
+          >
+            <span
+              aria-hidden="true"
+              class="inline-block font-mono uppercase h-1.5 w-1.5 rounded-full bg-white transition-colors group-hover:bg-orange cursor-pointer"
+            ></span>
+            {link.tag && <span class="font-mono text-tiny uppercase  tracking-wider text-brand">{link.tag}</span>}
+            <span>{link.label}</span>
+          </a>
+        ));
+      })}
+      <hr class="my-2 border-light/10" />
+      <Button label="Get Started" href="https://app.dreadnode.io/?mode=register" variant="primary" class="mt-2 justify-center" />
+    </nav>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>("[data-nav-toggle]");
+  const mobilePanel = document.querySelector<HTMLElement>("[data-nav-mobile]");
+  const iconOpen = document.querySelector<SVGElement>("[data-nav-icon-open]");
+  const iconClose = document.querySelector<SVGElement>("[data-nav-icon-close]");
+  const triggers = document.querySelectorAll<HTMLButtonElement>("[data-nav-trigger]");
+
+  // Mobile menu toggle
+  toggle?.addEventListener("click", () => {
+    const isOpen = !mobilePanel?.classList.contains("hidden");
+    mobilePanel?.classList.toggle("hidden", isOpen);
+    iconOpen?.classList.toggle("hidden", !isOpen);
+    iconClose?.classList.toggle("hidden", isOpen);
+    toggle.setAttribute("aria-expanded", String(!isOpen));
+    toggle.setAttribute("aria-label", !isOpen ? "Close menu" : "Open menu");
+  });
+
+  // Desktop dropdowns
+  const closeAllPanels = (except?: HTMLElement) => {
+    triggers.forEach((t) => {
+      const p = t.nextElementSibling as HTMLElement;
+      if (p && p !== except) {
+        p.classList.add("hidden");
+        t.setAttribute("aria-expanded", "false");
+      }
+    });
+  };
+
+  const openPanel = (trigger: HTMLButtonElement, panel: HTMLElement) => {
+    closeAllPanels(panel);
+    panel.classList.remove("hidden");
+    trigger.setAttribute("aria-expanded", "true");
+  };
+
+  const closePanel = (trigger: HTMLButtonElement, panel: HTMLElement) => {
+    panel.classList.add("hidden");
+    trigger.setAttribute("aria-expanded", "false");
+  };
+
+  triggers.forEach((trigger) => {
+    const panel = trigger.nextElementSibling as HTMLElement;
+    if (!panel) return;
+    const item = trigger.closest<HTMLElement>("[data-nav-item]");
+    if (!item) return;
+
+    let closeTimer: ReturnType<typeof setTimeout> | null = null;
+    const cancelClose = () => { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } };
+    const scheduleClose = () => {
+      cancelClose();
+      closeTimer = setTimeout(() => closePanel(trigger, panel), 150);
+    };
+
+    // Click still toggles (keyboard/touch)
+    trigger.addEventListener("click", () => {
+      const isOpen = !panel.classList.contains("hidden");
+      if (isOpen) closePanel(trigger, panel);
+      else openPanel(trigger, panel);
+    });
+
+    // Hover to open
+    item.addEventListener("mouseenter", () => {
+      cancelClose();
+      openPanel(trigger, panel);
+    });
+    item.addEventListener("mouseleave", scheduleClose);
+    panel.addEventListener("mouseenter", cancelClose);
+    panel.addEventListener("mouseleave", scheduleClose);
+
+    // Keyboard focus opens as well
+    trigger.addEventListener("focus", () => openPanel(trigger, panel));
+  });
+
+  // Close on outside click
+  document.addEventListener("click", (e) => {
+    if (!(e.target as Element).closest("[data-nav-item]")) {
+      triggers.forEach((t) => {
+        (t.nextElementSibling as HTMLElement)?.classList.add("hidden");
+        t.setAttribute("aria-expanded", "false");
+      });
+    }
+  });
+
+  // Escape closes everything
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    triggers.forEach((t) => {
+      (t.nextElementSibling as HTMLElement)?.classList.add("hidden");
+      t.setAttribute("aria-expanded", "false");
+    });
+    if (mobilePanel && !mobilePanel.classList.contains("hidden")) {
+      mobilePanel.classList.add("hidden");
+      iconOpen?.classList.remove("hidden");
+      iconClose?.classList.add("hidden");
+      toggle?.setAttribute("aria-expanded", "false");
+    }
+  });
+</script>

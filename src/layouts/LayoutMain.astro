@@ -1,0 +1,37 @@
+---
+// A layout is a reusable wrapper for your pages.
+// Anything you put between <Layout>...</Layout> in a page lands in <slot />.
+//
+// Props are declared via an interface and read from Astro.props.
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = "Dreadnode", description = "AI infrastructure for the security stack" } = Astro.props;
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+
+
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <slot name="head" />
+  </head>
+  <body>
+    <Nav />
+    <main class="overflow-clip">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
