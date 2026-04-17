@@ -1,6 +1,4 @@
 ---
-import { codeToHtml } from 'shiki';
-
 interface Props {
   code: string;
   lang?: string;
@@ -8,34 +6,33 @@ interface Props {
   class?: string;
 }
 
-const { code, lang = "bash", label = "Install Dreadnode", class: className = "" } = Astro.props;
+const { code, label = "Install Dreadnode", class: className = "" } = Astro.props;
 
-const highlighted = await codeToHtml(code, {
-  lang,
-  theme: {
-    name: 'dreadnode',
-    type: 'dark',
-    bg: 'transparent',
-    fg: '#ffffff',
-    settings: [
-      // Commands like `curl`, `bash`, `pip`, `npm`
-      { scope: ['support.function', 'entity.name.function', 'entity.name.command'], settings: { foreground: '#4ade80' } },
-      // Flags like `-fsSL`
-      { scope: ['variable.parameter', 'entity.other.attribute-name', 'constant.other.option'], settings: { foreground: '#ffffffb3' } },
-      // URLs and strings
-      { scope: ['string', 'string.quoted', 'markup.underline.link', 'constant.other.url'], settings: { foreground: '#ef562f' } },
-      // Pipe / operators
-      { scope: ['keyword.operator', 'punctuation.separator'], settings: { foreground: '#ffffff80' } },
-      // Comments
-      { scope: ['comment'], settings: { foreground: '#ffffff4d', fontStyle: 'italic' } },
-    ],
-  },
-});
+const CMD_COLOR = "#4ade80";
+const FLAG_COLOR = "#ffffffb3";
+const URL_COLOR = "#ef562f";
+const OP_COLOR = "#ffffff80";
 
-// Strip the wrapping <pre><code>...</code></pre> tags — we only want the inner spans
-const inner = highlighted
-  .replace(/^<pre[^>]*><code[^>]*>/, '')
-  .replace(/<\/code><\/pre>$/, '');
+function tokenize(src: string) {
+  const parts: { text: string; color?: string }[] = [];
+  const re = /(\s+)|(\|)|(-[A-Za-z]+)|(https?:\/\/\S+)|(\S+)/g;
+  let m: RegExpExecArray | null;
+  let first = true;
+  while ((m = re.exec(src)) !== null) {
+    const [, ws, pipe, flag, url, word] = m;
+    if (ws) parts.push({ text: ws });
+    else if (pipe) parts.push({ text: pipe, color: OP_COLOR });
+    else if (flag) parts.push({ text: flag, color: FLAG_COLOR });
+    else if (url) parts.push({ text: url, color: URL_COLOR });
+    else if (word) {
+      parts.push({ text: word, color: first ? CMD_COLOR : undefined });
+      first = false;
+    }
+  }
+  return parts;
+}
+
+const tokens = tokenize(code);
 ---
 <div class:list={["group relative flex-col inline-flex md:flex-row items-center gap-3 border border-dark-7 bg-dark-secondary px-6 py-6 font-mono text-sm lg:text-body-lg text-light transition hover:border-white/40 hover:shadow-lg cursor-pointer ", className]}
   data-code={code}
@@ -45,7 +42,9 @@ const inner = highlighted
 >
   {label && <span class="uppercase text-body-xsm text-muted tracking-wider select-none">{label}</span>}
   <span class="text-muted select-none" aria-hidden="true">$</span>
-  <code class="flex-1 select-all" set:html={inner} />
+  <code class="flex-1 select-all whitespace-pre">
+    {tokens.map((t) => (t.color ? <span style={`color:${t.color}`}>{t.text}</span> : <span>{t.text}</span>))}
+  </code>
   <span class="copy-icon ml-2 shrink-0 text-muted transition group-hover:text-light" aria-hidden="true">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
