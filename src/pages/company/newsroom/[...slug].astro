@@ -1,0 +1,86 @@
+---
+import { getCollection, render } from "astro:content";
+import LayoutMain from "../../../layouts/LayoutMain.astro";
+import SectionMain from "../../../components/SectionMain.astro";
+
+export async function getStaticPaths() {
+	const items = await getCollection(
+		"newsroom",
+		({ data }) => !data.draft && !data.url,
+	);
+	return items.map((item) => ({
+		params: { slug: item.id },
+		props: { item },
+	}));
+}
+
+const { item } = Astro.props;
+const { Content } = await render(item);
+
+const dateLabel = item.data.date
+	? item.data.date.toLocaleDateString("en-US", {
+			month: "short",
+			day: "2-digit",
+			year: "numeric",
+		})
+	: null;
+
+const categoryChipClass: Record<string, string> = {
+	Blog: "border-cat-blog text-cat-blog",
+	Paper: "border-cat-paper text-cat-paper",
+	Talk: "border-cat-talk text-cat-talk",
+	Code: "border-cat-code text-cat-code",
+	Announcement: "border-cat-announcement text-cat-announcement",
+	Event: "border-cat-event text-cat-event",
+};
+const chipClass = categoryChipClass[item.data.category] || "border-light-faded text-muted";
+---
+
+<LayoutMain title={`${item.data.title} — Dreadnode`}>
+	<SectionMain padding="lg" contentClass="relative">
+		<article class="container-large relative z-10 flex flex-col gap-6">
+			<span class:list={[
+				"inline-flex w-fit items-center border px-2 py-0.5 font-mono text-body-xsm uppercase tracking-wider",
+				chipClass,
+			]}>
+				{item.data.category}
+			</span>
+			<h1 class="h2 max-w-[32ch]">{item.data.title}</h1>
+			<p class="text-body-lg text-muted max-w-[60ch]">
+				{item.data.description}
+			</p>
+
+			{
+				(item.data.author || dateLabel) && (
+					<div class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-body-xsm uppercase tracking-wider text-muted">
+						{item.data.author && <span>{item.data.author}</span>}
+						{item.data.author && dateLabel && (
+							<span aria-hidden="true">·</span>
+						)}
+						{dateLabel && (
+							<time datetime={item.data.date?.toISOString()}>
+								{dateLabel}
+							</time>
+						)}
+					</div>
+				)
+			}
+
+			{
+				item.data.tags.length > 0 && (
+					<ul class="flex flex-wrap gap-2">
+						{item.data.tags.map((t) => (
+							<li class="inline-flex border border-light-faded px-2 py-0.5 font-mono text-body-xsm uppercase tracking-wider text-muted">
+								{t}
+							</li>
+						))}
+					</ul>
+				)
+			}
+
+			<div class="prose prose-invert mt-8 max-w-[72ch]">
+				<Content />
+			</div>
+		</article>
+	</SectionMain>
+</LayoutMain>

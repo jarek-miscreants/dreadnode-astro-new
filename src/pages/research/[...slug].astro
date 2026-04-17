@@ -2,7 +2,6 @@
 import { getCollection, render } from 'astro:content';
 import LayoutMain from '../../layouts/LayoutMain.astro';
 import SectionMain from '../../components/SectionMain.astro';
-import Eyebrow from '../../components/Eyebrow.astro';
 
 export async function getStaticPaths() {
 	const items = await getCollection('research', ({ data }) => !data.draft && !data.url);
@@ -11,11 +10,26 @@ export async function getStaticPaths() {
 
 const { item } = Astro.props;
 const { Content } = await render(item);
+
+const categoryChipClass: Record<string, string> = {
+	Blog: "border-cat-blog text-cat-blog",
+	Paper: "border-cat-paper text-cat-paper",
+	Talk: "border-cat-talk text-cat-talk",
+	Code: "border-cat-code text-cat-code",
+	Announcement: "border-cat-announcement text-cat-announcement",
+	Event: "border-cat-event text-cat-event",
+};
+const chipClass = categoryChipClass[item.data.category] || "border-light-faded text-muted";
 ---
 <LayoutMain title={`${item.data.title} — Dreadnode`}>
 	<SectionMain padding="lg" contentClass="relative">
 		<article class="container-large relative z-10 flex flex-col gap-6">
-			<Eyebrow label={item.data.category} class="text-orange" />
+			<span class:list={[
+				"inline-flex w-fit items-center border px-2 py-0.5 font-mono text-body-xsm uppercase tracking-wider",
+				chipClass,
+			]}>
+				{item.data.category}
+			</span>
 			<h1 class="h2 max-w-[24ch]">{item.data.title}</h1>
 			<p class="text-body-lg text-muted max-w-[60ch]">{item.data.description}</p>
 			{item.data.tags.length > 0 && (

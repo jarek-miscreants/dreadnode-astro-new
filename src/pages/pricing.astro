@@ -1,0 +1,209 @@
+---
+import LayoutMain from "../layouts/LayoutMain.astro";
+import SectionMain from "../components/SectionMain.astro";
+import Grid from "../components/Grid.astro";
+import Eyebrow from "../components/Eyebrow.astro";
+import Button from "../components/Button.astro";
+import Accordion from "../components/Accordion.astro";
+import { Icon } from "astro-icon/components";
+import CanvasAnimation from "../components/CanvasAnimation.astro";
+const tiers = [
+	{
+		name: "Pro",
+		price: "Pay-as-you-go",
+		description: "For builders, practitioners, and teams.",
+		cta: { label: "Get Started for Free", href: "https://app.dreadnode.io/?mode=register" },
+		footnote: "*$25 complimentary credits — no payment required.",
+		features: [
+			"All platform features",
+			"Unlimited seats, team management",
+			"Fully managed SaaS",
+			"Pay-as-you-go for credits based on usage",
+			"No monthly fee, commitment, or recurring subscription required",
+		],
+	},
+	{
+		name: "Enterprise",
+		price: "Custom",
+		description:
+			"For organizations who require scaled agentic workloads and custom capabilities.",
+		cta: { label: "Request a Quote", href: "/company/contact" },
+		footnote: null,
+		features: [
+			"Everything in Pro plan, plus:",
+			"On-prem deployment",
+			"Control your own data",
+			"Dedicated engineer support",
+			"Access to our team for custom capabilities",
+			"One-time annual fee (varies based on deployment requirements, SLAs, and custom work), then pay-as-you-go for credits based on usage",
+		],
+	},
+];
+
+const faq = [
+	{
+		question: "Can I try Dreadnode before committing?",
+		answer: "Yes, get started for free when you sign up for the Pro plan.",
+	},
+	{
+		question: "Do you offer on-premise deployment or air-gapped environments?",
+		answer:
+			"Yes. On-prem deployment is available with the Enterprise plan. Contact our team to discuss your deployment requirements.",
+	},
+	{
+		question: "What is a credit?",
+		answer:
+			"1 credit = $0.01 USD. Credits are spent on inference and compute. The more complex the task, the more credits required.",
+	},
+	{
+		question: "Do you use our data to train models?",
+		answer:
+			"No. Your data is never used for training. All evaluation, training, Worlds, and AI red teaming data stays within your organization's environment.",
+	},
+	{
+		question: "What are my payment options?",
+		answer:
+			"We use Stripe for payment. You can use all major credit cards, connect your bank account, or even use a financial service platform like CashApp.",
+	},
+	{
+		question: "Do you offer academia or non-profit discounts?",
+		answer:
+			"Please reach out via dreadnode.io/contact with a proposal and we're happy to consider it.",
+	},
+	{
+		question: "What happens when I run out of credits?",
+		answer:
+			"When you get low on credits, the platform will prompt you to purchase additional credits. You can set up auto-replenish, if desired.",
+	},
+];
+---
+
+<LayoutMain title="Pricing — Dreadnode">
+	{/* ============================== HERO ============================== */}
+	<SectionMain
+		id="hero"
+		paddingTop="lg"
+		paddingBottom="none"
+		contentClass="items-center text-center relative"
+	>
+		<div class="container-large relative z-10 flex flex-col items-center">
+			<Eyebrow label="Pricing" class="text-orange mb-4" />
+			<h1 class="h1 max-w-[22ch]">The Dreadnode Platform</h1>
+			<p class="text-body-lg lg:text-body-xl text-muted mt-6 max-w-[60ch]">
+				AI-native security capabilities at the cost of tokens and MicroVMs.
+			</p>
+		</div>
+	</SectionMain>
+
+	{/* ============================== TIERS ============================== */}
+	<SectionMain
+		id="tiers"
+		paddingTop="sm"
+		paddingBottom="sm"
+		contentClass="relative"
+	>
+		<div class="container-large">
+			<Grid
+				mobile={1}
+				mobileLandscape={1}
+				tablet={1}
+				desktop={2}
+				gap="gap-4"
+			>
+				{tiers.map((tier) => (
+					<div class="bg-elevated border border-muted-dark rounded-sm card-padding flex flex-col gap-6">
+						<div class="flex flex-col gap-4">
+							<Eyebrow label={tier.name} class="text-orange" />
+							<h2 class="h3 text-light">{tier.price}</h2>
+							<p class="text-body-md text-muted max-w-[38ch]">
+								{tier.description}
+							</p>
+						</div>
+
+						<div class="flex flex-col gap-4">
+							<Button
+								label={tier.cta.label}
+								variant="orange"
+								href={tier.cta.href}
+							/>
+							{tier.footnote && (
+								<p class="text-body-xsm text-mono text-muted">
+									{tier.footnote}
+								</p>
+							)}
+						</div>
+
+						<hr class="border-muted-dark" />
+
+						<ul class="flex flex-col gap-3" role="list">
+							{tier.features.map((feature) => (
+								<li class="flex items-start gap-3 text-body-md text-muted">
+									<Icon
+										name="lucide:check"
+										class="text-orange w-4 h-4 mt-1 shrink-0"
+										aria-hidden="true"
+									/>
+									<span>{feature}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				))}
+			</Grid>
+		</div>
+	</SectionMain>
+
+	{/* ============================== FAQ ============================== */}
+	<SectionMain
+		id="faq"
+		paddingTop="md"
+		paddingBottom="lg"
+		contentClass="section-border-top relative"
+	>
+		<div class="container-large">
+			<Grid
+				mobile={1}
+				mobileLandscape={1}
+				tablet={1}
+				desktop={3}
+				gap="gap-8"
+			>
+				<div class="col-span-1">
+					
+					<h2 class="h3">Frequently asked questions</h2>
+				</div>
+
+				<div class="col-span-2">
+					<Accordion items={faq} />
+				</div>
+			</Grid>
+		</div>
+	</SectionMain>
+	{/* ============================ CTA =========================== */}
+	<SectionMain
+		id="integrations"
+		paddingTop="lg"
+		paddingBottom="sm"
+		contentClass="relative"
+	>
+		<CanvasAnimation
+			projectId="obtBsepkLtG7yfDC9TaJ"
+			hosted
+			class="pointer-events-none absolute inset-0 z-0 mt-8 -mb-8"
+		/>
+		<div class="container-large relative z-10">
+			<div class="flex flex-col items-center text-center mb-8 lg:mb-12">
+				<Eyebrow label="Try it now" class="text-white mb-4" />
+				<h2 class="h2 max-w-[24ch]">
+					Explore what’s possible when AI is applied to offense,
+				</h2>
+				<Button
+					label="Get Started"
+					variant="primary"
+					href="https://app.dreadnode.io/?mode=register"
+					class="mt-5"
+				/>
+			</div>
+		</div>
+	</SectionMain>
+</LayoutMain>

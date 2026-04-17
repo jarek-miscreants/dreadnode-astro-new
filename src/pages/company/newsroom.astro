@@ -1,0 +1,70 @@
+---
+import { getCollection } from "astro:content";
+import LayoutMain from "../../layouts/LayoutMain.astro";
+import SectionMain from "../../components/SectionMain.astro";
+import Grid from "../../components/Grid.astro";
+import Eyebrow from "../../components/Eyebrow.astro";
+import ResourcesCard from "../../components/ResourcesCard.astro";
+
+const items = (
+	await getCollection("newsroom", ({ data }) => !data.draft)
+).sort(
+	(a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
+);
+---
+
+<LayoutMain title="Newsroom — Dreadnode">
+	{/* ============================== HERO ============================== */}
+	<SectionMain
+		id="hero"
+		paddingTop="lg"
+		paddingBottom="none"
+		contentClass="relative"
+	>
+		<div class="container-large relative z-10 flex flex-col">
+			<Eyebrow label="Newsroom" class="text-orange mb-4" />
+			<h1 class="h2">News &amp; announcements</h1>
+			<p class="text-body-lg text-muted mt-6 max-w-[60ch]">
+				Product announcements, press coverage, and updates from the
+				Dreadnode team.
+			</p>
+		</div>
+	</SectionMain>
+
+	{/* ============================== LIST ============================== */}
+	<SectionMain id="newsroom-list" padding="sm" contentClass="relative">
+		<div class="container-large">
+			<Grid
+				mobile={1}
+				mobileLandscape={1}
+				tablet={2}
+				desktop={3}
+				gap="gap-2"
+			>
+				{
+					items.map((item) => (
+						<ResourcesCard
+							title={item.data.title}
+							description={item.data.description}
+							category={item.data.category}
+							author={item.data.author}
+							date={item.data.date}
+							href={
+								item.data.url ??
+								`/company/newsroom/${item.id}`
+							}
+						/>
+					))
+				}
+			</Grid>
+
+			{
+				items.length === 0 && (
+					<p class="mt-8 font-mono text-body-sm text-muted">
+						No news yet. Check back soon.
+					</p>
+				)
+			}
+		</div>
+	</SectionMain>
+</LayoutMain>

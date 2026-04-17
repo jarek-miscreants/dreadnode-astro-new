@@ -32,17 +32,17 @@
 
   const hasMedia = Astro.slots.has("media");
   ---
-  <div class:list={["px-4 pt-4 md:pt-6 md:px-8 rounded-sm relative", hasMedia ? "pb-0" : "pb-8", borderClass, className]}>
-    <div class="flex flex-col gap-4">
+  <article class:list={["px-4 pt-4 md:pt-6 md:px-8 rounded-sm relative", hasMedia ? "pb-0" : "pb-8", borderClass, className]}>
+    <div class="flex flex-col gap-3">
       <Eyebrow label={eyebrow} variant="plain" class="text-orange"/>
       {icon && (
-        <Icon name={icon} class="text-orange w-5 h-5 mb-3" aria-hidden="true" />
+        <Icon name={icon} class="text-orange w-5 h-5 mb-1" aria-hidden="true" />
       )}
       <TitleTag class={titleClass}>{title}</TitleTag>
       <p class="text-muted">{description}</p>
       <slot name="media" />   {/* renders nothing if caller passes nothing */}
       <slot name="button" />
     </div>
-  </div>
+  </article>
 
 

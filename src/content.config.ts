@@ -15,4 +15,18 @@ const research = defineCollection({
   }),
 });
 
-export const collections = { research };
+const newsroom = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/newsroom" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    category: z.enum(["Announcement", "Event"]),
+    tags: z.array(z.string()).default([]),
+    date: z.coerce.date().optional(),
+    author: z.string().optional(),
+    url: z.string().url().optional(),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { research, newsroom };

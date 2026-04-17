@@ -1,0 +1,224 @@
+---
+interface Item {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  items: Item[];
+  /** Close other items when one opens. Default: true */
+  closePrevious?: boolean;
+  /** Allow closing an open item by clicking it again. Default: true */
+  closeOnSecondClick?: boolean;
+  /** 1-based index of item to open by default */
+  openByDefault?: number;
+  class?: string;
+}
+
+const {
+  items,
+  closePrevious = true,
+  closeOnSecondClick = true,
+  openByDefault,
+  class: className = "",
+} = Astro.props;
+---
+
+<div
+  data-accordion="component"
+  data-close-previous={closePrevious}
+  data-close-on-second-click={closeOnSecondClick}
+  data-open-by-default={openByDefault}
+  class:list={["accordion-group border-t border-muted-dark", className]}
+>
+  {items.map((item) => (
+    <div data-accordion="item" class="accordion-item border-b border-muted-dark">
+      <button
+        type="button"
+        data-accordion="button"
+        class="accordion-button w-full flex items-center justify-between gap-6 py-7 px-2 md:px-4 text-left cursor-pointer bg-transparent border-0 transition-colors duration-200 hover:bg-dark-5 focus-visible:outline-none focus-visible:bg-dark-5"
+      >
+        <span class="accordion-question font-mono uppercase text-muted pr-4">
+          {item.question}
+        </span>
+        <span class="checkbox_icon" data-accordion="icon" aria-hidden="true">
+          <span class="checkbox_line"></span>
+          <span class="checkbox_line is-second"></span>
+        </span>
+      </button>
+
+      <div data-accordion="content" class="accordion-content">
+        <div class="accordion-content-inner px-2 md:px-4 pb-6 -mt-1">
+          <p class="text-body-md text-muted max-w-[72ch]">{item.answer}</p>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style is:global>
+  /* Smooth height animation via CSS grid rows */
+  [data-accordion="content"] {
+    display: grid;
+    grid-template-rows: minmax(0, 0fr);
+    overflow: hidden;
+    transition: grid-template-rows 0.35s ease;
+  }
+  [data-accordion="content"] > * {
+    min-height: 0;
+  }
+  [data-accordion="item"].is-active [data-accordion="content"] {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  /* Checkbox icon — diamond outline that rotates on open */
+  .checkbox_icon {
+    position: relative;
+    display: inline-block;
+    width: 0.8rem;
+    height: 0.8rem;
+    flex-shrink: 0;
+    outline: 1px solid var(--color-muted);
+    outline-offset: 0;
+    border-radius: 0.25rem;
+    transform: rotate(45deg);
+    transition:
+      transform 0.3s ease,
+      outline-color 0.3s ease;
+  }
+
+  .checkbox_line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 1px;
+    background-color: var(--color-muted);
+    transform: translate(-50%, -50%) rotate(45deg);
+    transition:
+      transform 0.3s ease,
+      background-color 0.3s ease;
+  }
+
+  .checkbox_line.is-second {
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+
+  [data-accordion="item"].is-active .checkbox_icon {
+    transform: rotate(90deg);
+    outline-color: var(--color-light);
+  }
+
+  [data-accordion="item"].is-active .checkbox_line,
+  [data-accordion="item"].is-active .checkbox_line.is-second {
+    background-color: var(--color-light);
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  [data-accordion="item"].is-active .accordion-question {
+    color: var(--color-light);
+  }
+</style>
+
+<script>
+  document
+    .querySelectorAll<HTMLElement>('[data-accordion="component"]')
+    .forEach((component) => {
+      if (component.dataset.scriptInitialized) return;
+      component.dataset.scriptInitialized = "true";
+
+      const closePrevious =
+        component.getAttribute("data-close-previous") !== "false";
+      const closeOnSecondClick =
+        component.getAttribute("data-close-on-second-click") !== "false";
+      const openByDefault =
+        Number(component.getAttribute("data-open-by-default")) || 0;
+
+      const items = Array.from(
+        component.querySelectorAll<HTMLElement>(
+          ':scope > [data-accordion="item"]'
+        )
+      );
+      const buttons = items.map(
+        (item) =>
+          item.querySelector<HTMLElement>('[data-accordion="button"]')!
+      );
+
+      items.forEach((item, i) => {
+        const button = buttons[i];
+        const content = item.querySelector<HTMLElement>(
+          '[data-accordion="content"]'
+        );
+        if (!button || !content) return;
+
+        const buttonId = `accordion-btn-${Math.random().toString(36).slice(2, 8)}`;
+        const contentId = `accordion-content-${Math.random().toString(36).slice(2, 8)}`;
+
+        button.setAttribute("aria-expanded", "false");
+        button.setAttribute("id", buttonId);
+        button.setAttribute("aria-controls", contentId);
+        content.setAttribute("role", "region");
+        content.setAttribute("id", contentId);
+        content.setAttribute("aria-labelledby", buttonId);
+      });
+
+      function close(index: number) {
+        const item = items[index];
+        if (!item.classList.contains("is-active")) return;
+        item.classList.remove("is-active");
+        buttons[index].setAttribute("aria-expanded", "false");
+      }
+
+      function open(index: number) {
+        if (closePrevious) {
+          items.forEach((_, i) => {
+            if (i !== index) close(i);
+          });
+        }
+        items[index].classList.add("is-active");
+        buttons[index].setAttribute("aria-expanded", "true");
+      }
+
+      function toggle(index: number) {
+        if (items[index].classList.contains("is-active")) {
+          if (closeOnSecondClick) close(index);
+        } else {
+          open(index);
+        }
+      }
+
+      if (openByDefault > 0 && openByDefault <= items.length) {
+        open(openByDefault - 1);
+      }
+
+      buttons.forEach((btn, i) => {
+        btn.addEventListener("click", () => toggle(i));
+      });
+
+      component.addEventListener("keydown", (e) => {
+        const focusedIndex = buttons.indexOf(
+          document.activeElement as HTMLElement
+        );
+        if (focusedIndex === -1) return;
+
+        let newIndex: number | null = null;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          newIndex = (focusedIndex + 1) % items.length;
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          newIndex = (focusedIndex - 1 + items.length) % items.length;
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          newIndex = 0;
+        } else if (e.key === "End") {
+          e.preventDefault();
+          newIndex = items.length - 1;
+        }
+
+        if (newIndex !== null) {
+          buttons[newIndex].focus();
+        }
+      });
+    });
+</script>
