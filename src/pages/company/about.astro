@@ -1,0 +1,29 @@
+---
+import LayoutMain from "../../layouts/LayoutMain.astro";
+import SectionMain from "../../components/SectionMain.astro";
+import Eyebrow from "../../components/Eyebrow.astro";
+---
+<LayoutMain>
+<SectionMain id="about" paddingTop="lg" paddingBottom="sm" contentClass="items-center text-center relative">
+<div class="container-large">
+    <h1 class="h2">We exist to make AI-native security a reality
+    </h1>
+    <p class="text-body-lg lg:text-body-xl text-muted mt-6">Not just AI for security. The infrastructure the security industry needs to operationalize AI at scale.
+
+    </p>
+</div>
+</SectionMain>
+<SectionMain id="our-story" paddingTop="sm" paddingBottom="sm" contentClass="bg-elevated items-center text-center relative">
+<div class="container-large">
+    <div class="flex flex-col items-center text-center mb-8 lg:mb-12">
+    <Eyebrow label="Our Story" class="text-orange mb-4" />
+    <h2 class="h2">Built by (and for) offensive security operators
+    </h2>
+    <p class="text-body-lg lg:text-body-xl text-muted mt-6 max-w-[64ch]">
+        Dreadnode was founded with the mission to prove AI can perform offensive security operations. That thesis has been validated across use cases. Offense was the proving ground, and we now recognize that the opportunity is even bigger: AI is going to change the entire security stack. While we continue to prioritize offensive security and AI red teaming capabilities, we’ve built what’s required to achieve AI-native security.
+    </p>
+    </div>
+</div>
+</SectionMain>
+
+</LayoutMain>
