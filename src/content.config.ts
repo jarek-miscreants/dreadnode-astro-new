@@ -29,4 +29,16 @@ const newsroom = defineCollection({
   }),
 });
 
-export const collections = { research, newsroom };
+const team = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/team" }),
+  schema: z.object({
+    name: z.string(),
+    role: z.string(),
+    linkedin: z.string().url().optional(),
+    image: z.string(),
+    order: z.number().default(999),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { research, newsroom, team };
