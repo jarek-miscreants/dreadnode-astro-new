@@ -1,0 +1,90 @@
+media:
+  - name: uploads
+    label: Uploads
+    input: public/images/uploads
+    output: /images/uploads
+  - name: team
+    label: Team photos
+    input: public/images/team
+    output: /images/team
+
+content:
+  - name: research
+    label: Research
+    type: collection
+    path: src/content/research
+    filename: "{fields.title | slugify}.md"
+    view:
+      fields: [title, category, date, draft]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - { name: title, label: Title, type: string, required: true }
+      - { name: description, label: Description, type: text, required: true }
+      - name: category
+        label: Category
+        type: select
+        required: true
+        options:
+          values: [Blog, Paper, Talk, Code]
+      - { name: tags, label: Tags, type: string, list: true }
+      - { name: date, label: Date, type: date }
+      - { name: author, label: Author, type: string }
+      - { name: url, label: External URL, type: string }
+      - { name: draft, label: Draft, type: boolean, default: false }
+      - { name: body, label: Body, type: rich-text }
+
+  - name: newsroom
+    label: Newsroom
+    type: collection
+    path: src/content/newsroom
+    filename: "{fields.title | slugify}.md"
+    view:
+      fields: [title, category, date, draft]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - { name: title, label: Title, type: string, required: true }
+      - { name: description, label: Description, type: text, required: true }
+      - name: category
+        label: Category
+        type: select
+        required: true
+        options:
+          values: [Announcement, Event]
+      - { name: tags, label: Tags, type: string, list: true }
+      - { name: date, label: Date, type: date }
+      - { name: author, label: Author, type: string }
+      - { name: url, label: External URL, type: string }
+      - { name: draft, label: Draft, type: boolean, default: false }
+      - { name: body, label: Body, type: rich-text }
+
+  - name: team
+    label: Team
+    type: collection
+    path: src/content/team
+    filename: "{fields.name | slugify}.md"
+    view:
+      fields: [name, role, order, draft]
+      primary: name
+      sort: [order, name]
+      default:
+        sort: order
+        order: asc
+    fields:
+      - { name: name, label: Name, type: string, required: true }
+      - { name: role, label: Role, type: string, required: true }
+      - { name: linkedin, label: LinkedIn URL, type: string }
+      - name: image
+        label: Photo
+        type: image
+        media: team
+        required: true
+      - { name: order, label: Sort order, type: number, default: 999 }
+      - { name: draft, label: Draft, type: boolean, default: false }
